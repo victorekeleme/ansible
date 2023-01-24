@@ -1,0 +1,3 @@
+linux_name: vistein
+location: /home/{{linux_name}}/project/react-nodejs-example
+version: 1.0.0

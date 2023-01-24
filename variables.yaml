@@ -14,7 +14,7 @@
   tasks:
     - name: Create linux user
       user:
-        name: vistein
+        name: "{{linux_name}}"
         comment: Vistain Admin
         group: admin
       register: user_creation_result
@@ -24,20 +24,24 @@
 - name: Deploy Nodejs app
   hosts: webservers
   become: True
-  become_user: vistein
+  become_user: "{{linux_name}}"
+  vars_files:
+    - project-vars
+  vars:
+    - user_home_dir: /home/{{linux_name}}
   tasks:
   - name: Unpack the nodejs file
     unarchive:
-      src: /home/victor/project/react-nodejs-example/api/react-nodejs-example-1.0.0.tgz
-      dest: /home/vistein/
+      src: "{{location}}/api/react-nodejs-example-{{version}}.tgz"
+      dest: "{{user_home_dir}}"
     register: unarchive_result
   - debug: msg={{unarchive_result}}
   - name: Install dependencies
     npm:
-      path:  /home/vistein/package
+      path:  "{{user_home_dir}}/package"
   - name: Start the application
     ansible.builtin.command:
-      chdir: /home/vistein/package/
+      chdir: "{{user_home_dir}}/package/"
       cmd: node server
     async: 1000
     poll: 0
