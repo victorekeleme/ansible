@@ -1,0 +1,107 @@
+---
+- name: Deploy nexus on remote servers
+  hosts: server
+  tasks:
+    - name: Update apt repo and cache
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    - name: Install java 8, wget, git, vim, unzip & net-tools
+      apt:
+        pkg:
+        - wget
+        - git
+        - vim
+        - unzip
+        - net-tools
+        - openjdk-8-jre-headless 
+      register: install_result
+    - debug: msg={{install_result}}
+
+- name: Download and unpack nexus installer
+  hosts: server
+  tasks:
+  - name: Check nexus folder stats 
+    stat:
+      path: /opt/nexus
+    register: stat_result
+  - name: Dwonload nexus to /opt
+    get_url: 
+      url: https://download.sonatype.com/nexus/3/nexus-3.15.2-01-unix.tar.gz
+      dest: /opt/
+    register: download_result
+  #- debug: msg={{download_result}}
+  - name: Untar nexus installer
+    unarchive:
+      src: "{{download_result.dest}}"
+      dest: /opt/
+      remote_src: yes
+    when: not stat_result.stat.exists
+  - name: Find nexus folder
+    find: 
+      paths: /opt
+      pattern: "nexus-*"
+      file_type: directory
+    register: find_result
+  - debug: msg={{find_result}}
+  - name: Rename nexus folder
+    shell: mv {{find_result.files[0].path}} /opt/nexus
+    when: not stat_result.stat.exists
+
+- name: Create Nexus user to own nexus folder
+  hosts: server
+  tasks:
+  - name: Create nexus group
+    group:
+      name: nexus
+      state: present
+  - name: Create a nexus linux user and group
+    user:
+      name: nexus
+      comment: nexus user
+      group: nexus
+  - name: Make nexus user owner of nexus folder
+    file:
+      path: /opt/nexus
+      state: directory
+      owner: nexus
+      group: nexus
+      recurse: yes
+  - name: Make nexus user owner of sonatype-work folder
+    file:
+      path: /opt/sonatype-work
+      state: directory
+      owner: nexus
+      group: nexus
+      recurse: yes
+
+- name: Start nexus with nexus user
+  hosts: server
+  become: True
+  become_user: nexus
+  tasks:
+  - name: Insert nexus in run_as_user innexus.rc file
+    lineinfile:
+      path: /opt/nexus/bin/nexus.rc
+      regexp: '^#run_as_user=""'
+      line: run_as_user="nexus"
+    blockinfile:
+      path: /opt/nexus/bin/nexus.rc
+      block: |
+        run_as_user="nexus"  
+  - name: Start nexus
+    command: /opt/nexus/bin/nexus start
+
+- name: Verify application is running with ps and netstat
+  hosts: server
+  tasks:
+    - name: Ensure nexus is running with ps aux 
+      shell: ps aux | grep nexus
+      register: app_status
+    - debug: msg={{app_status.stdout_lines}}
+    - name: wait for application startup
+      pause:
+        minutes: 1
+    - name: Check with netstat
+      shell: netstat -lnpt
+      register: app_status
+    - debug: msg={{app_status.stdout_lines}}
+
