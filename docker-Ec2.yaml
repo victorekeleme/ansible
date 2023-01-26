@@ -1,0 +1,33 @@
+---
+- name: Install docker and docker-compose
+  hosts: aws_server
+  become: yes
+  tasks:
+    - name: install docker
+      vars:
+        ansible_python_interpreter: /usr/bin/python
+      yum:
+        name: docker
+        state: present
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+    - name: Reconnet to server session
+      meta: reset_connection
+    - name: Make sure docker is running
+      systemd:
+        name: docker
+        state: started
+    - name: Install docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.27.4/docker-compose-{{lookup('pipe', 'uname -s')}}-{{lookup('pipe', 'uname -m')}}
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+- name: Test docker pull
+  hosts: aws_server
+  tasks:
+    - name: pull redis
+      command: docker pull redis
+      
