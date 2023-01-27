@@ -20,14 +20,49 @@
       systemd:
         name: docker
         state: started
+    - name: Install docker python module (for ec2 instance only)
+      pip:
+        name: docker
+
     - name: Install docker-compose
       get_url:
         url: https://github.com/docker/compose/releases/download/1.27.4/docker-compose-{{lookup('pipe', 'uname -s')}}-{{lookup('pipe', 'uname -m')}}
         dest: /usr/local/bin/docker-compose
         mode: +x
-- name: Test docker pull
+
+- name: Start docker containers
   hosts: aws_server
+  vars_files:
+    - project-vars
   tasks:
-    - name: pull redis
-      command: docker pull redis
-      
+    - name: Copy docker-compose file to remote_server
+      copy:
+        src: /home/victor/project/docker-compose.yaml
+        dest: /home/ec2-user/docker-compose.yaml
+    - name: Login to docker registry
+      community.docker.docker_login:
+        username: "{{docker_username}}"
+        password: "{{docker_password}}"
+
+
+
+
+
+
+
+
+
+
+# - name: Test docker pull
+#   hosts: aws_server
+#   tasks:
+#     - name: pull redis
+#         command: docker pull redis
+
+# - name: Test docker pull
+#   hosts: aws_server
+#   tasks:
+#     - name: pull redis
+#       community.docker.docker_image:
+#         name: redis
+#         state: absent
