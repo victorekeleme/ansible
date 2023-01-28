@@ -2,6 +2,9 @@
 - name: Install docker and docker-compose
   hosts: aws_server
   become: yes
+  gather_facts: False
+  vars_files:
+    - project-vars
   tasks:
     - name: install docker
       vars:
@@ -9,20 +12,23 @@
       yum:
         name: docker
         state: present
-    - name: Add ec2-user to docker group
+    - name: Add {{server_user}} to docker group
       user:
-        name: ec2-user
-        groups: docker
-        append: yes
+        name: "{{server_user}}"
+        groups: adm, docker
+        
     - name: Reconnet to server session
       meta: reset_connection
     - name: Make sure docker is running
       systemd:
         name: docker
         state: started
+
     - name: Install docker python module (for ec2 instance only)
       pip:
-        name: docker
+        name:
+          - docker
+          - docker-compose
 
     - name: Install docker-compose
       get_url:
@@ -30,19 +36,28 @@
         dest: /usr/local/bin/docker-compose
         mode: +x
 
+
+
 - name: Start docker containers
   hosts: aws_server
+  become: true
+  become_user: "{{server_user}}"
   vars_files:
     - project-vars
   tasks:
     - name: Copy docker-compose file to remote_server
       copy:
         src: /home/victor/project/docker-compose.yaml
-        dest: /home/ec2-user/docker-compose.yaml
+        dest: /home/{{server_user}}/docker-compose.yaml
     - name: Login to docker registry
       community.docker.docker_login:
         username: "{{docker_username}}"
         password: "{{docker_password}}"
+    - name: Create and start services
+      community.docker.docker_compose:
+        project_src: /home/{{server_user}}
+        state: present
+
 
 
 
