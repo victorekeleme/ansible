@@ -15,7 +15,7 @@
 #         ansible_python_interpreter: /usr/bin/python
 
 - name: Install docker and docker-compose
-  hosts: all
+  hosts: "{{inventory_host}}"
   become: yes
   gather_facts: False
   vars_files:
@@ -54,7 +54,7 @@
 
 
 - name: Start docker containers
-  hosts: all
+  hosts: "{{inventory_host}}"
   become: true
   become_user: "{{server_user}}"
   vars_files:
