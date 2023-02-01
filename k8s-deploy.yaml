@@ -1,0 +1,6 @@
+---
+- name: Create a namespace on k8s cluster and deploy nginx webserver
+  hosts:
+  tasks:
+    - name: Create dev namespace on cluster
+      
