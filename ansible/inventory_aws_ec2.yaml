@@ -4,6 +4,3 @@ regions:
 keyed_groups:
   - key: tags
     prefix: tag
-exclude_filters:
-  - tag:Name:
-    - green
