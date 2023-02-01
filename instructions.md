@@ -5,3 +5,6 @@ Configure everything from scratch with Ansible
     >botocore
 Create a Pipeline in Jenkins
 Connect Pipeline to java maven project Create Jenkinsfile that executes Ansible Playbook on the remote Ansible server
+
+convert sshKey
+ssh-keygen -p -f .ssh/id_rsa -m pem -P "" -N ""
