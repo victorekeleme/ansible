@@ -1,6 +1,15 @@
 ---
 - name: Create a namespace on k8s cluster and deploy nginx webserver
-  hosts:
+  hosts: localhost
   tasks:
     - name: Create dev namespace on cluster
+      kubernetes.core.k8s:
+        name: prismic-app
+        api_version: v1
+        kind: Namespace
+        state: absent
+    - name: Deploy nginx webserver
+      kubernetes.core.k8s:
+        src: /home/victor/project/nginx-deploy.yaml
+        state: absent
       

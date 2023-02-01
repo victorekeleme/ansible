@@ -10,7 +10,7 @@ show results from inventory plugin:
 ansible-inventory -i inventory_aws_ec2.yaml
 
 Execute:
-ansible-playbook docker-Ec2.yaml
+ansible-playbook k8s-deploy.yaml
 
 Target specific hosts using filter
 <<inventory_aws_ec2.yaml
@@ -30,3 +30,17 @@ keyed_groups:
       prefix: instance_type  
 <<
 documentation: https://docs.ansible.com/ansible/latest/collections/amazon/aws/aws_ec2_inventory.html#parameter-filters
+
+KUBERNETES
+Requirements
+The below requirements are needed on the host that executes this k8s module.
+
+* python >= 3.6
+* kubernetes >= 12.0.0
+* PyYAML >= 3.11
+* jsonpatch
+
+Use
+aws eks update-kubeconfig --name <nameOfCluster> --region <clusterRegion> #Update kubeConfig
+K8S_AUTH_KUBECONFIG = /home/victor/.kube/config #export to be used in ansible control plane
+
