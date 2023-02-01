@@ -7,10 +7,3 @@ keyed_groups:
 exclude_filters:
   - tag:Name:
     - green
-  # - tag:Name:
-  #   - blue
-    
-
-
-    # filters:
-#   tag:Name: blue
