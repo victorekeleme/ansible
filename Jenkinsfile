@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     def remote = [:]
-                    remote.name = "ansible_server"
+                    remote.name = "ansible"
                     remote.host = ANSIBLE_SERVER_IP
                     remote.allowAnyHosts = true
 
