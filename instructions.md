@@ -1,10 +1,5 @@
-Create Ec2 instances
-Configure everything from scratch with Ansible
-  Requirements
-    >boto3
-    >botocore
-Create a Pipeline in Jenkins
-Connect Pipeline to java maven project Create Jenkinsfile that executes Ansible Playbook on the remote Ansible server
+<<Ansible Roles>> (like a package for your play)
+Group your content in roles
+Break up large playbooks into smaller manageable files to easily reuse and share them with others
 
-convert sshKey
-ssh-keygen -p -f .ssh/id_rsa -m pem -P "" -N ""
+Get Roles from community, Ansible galaxy
