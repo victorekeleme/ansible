@@ -24,12 +24,13 @@ pipeline {
         stage ("Execute Ansible playbook") {
             steps {
                 script {
-                    def remote = [:]
-                    remote.name = "ansible-server"
-                    remote.host = ANSIBLE_SERVER_IP
-                    remote.allowAnyHosts = true
-
                     withCredentials([sshUserPrivateKey(credentialsId: 'ansible-server-key', keyFileVariable: 'identity', passphraseVariable: '',  usernameVariable: 'user')]) {
+
+                        def remote = [:]
+                        remote.name = "ansible"
+                        remote.host = ANSIBLE_SERVER_IP
+                        remote.allowAnyHosts = true
+                        
                         remote.user = user
                         remote.identityFile = identity
                         sshCommand remote: remote, command: 'ls -la'
