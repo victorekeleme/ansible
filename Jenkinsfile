@@ -11,7 +11,7 @@ pipeline {
                 script {
                     echo "copying all ansible configurations to ansible control node"
                     sshagent(['ansible-server-key']) {
-                        sh "scp -o StrictHostKeyChecking=no ansible/* root@${ANSIBLE_SERVER_IP}:/home/victor/jenkins"
+                        sh "scp -o StrictHostKeyChecking=no ansible/* root@${ANSIBLE_SERVER_IP}:/"
 
                         withCredentials([sshUserPrivateKey(credentialsId: 'ec2-server-key', keyFileVariable: 'keyfile', usernameVariable: 'user')]) {
                             sh 'scp ${keyfile} root@${ANSIBLE_SERVER_IP}:/home/victor/.ssh/ssh-key.pem'
@@ -34,7 +34,7 @@ pipeline {
                         remote.user = user
                         remote.identityFile = identity
 
-                        sh "ssh -i ${identity} ${user}@${ANSIBLE_SERVER_IP} '/home/victor/jenkins/ansible-playbook docker-install.yaml'"
+                        sh "ssh -i ${identity} ${user}@${ANSIBLE_SERVER_IP} 'ansible-playbook docker-install.yaml'"
                         // sshCommand remote: remote, command: 'ls -la'
                     }
                 }
