@@ -33,7 +33,9 @@ pipeline {
                         
                         remote.user = user
                         remote.identityFile = identity
-                        sshCommand remote: remote, command: 'ls -la'
+
+                        sh "ssh -i ${identiy} ${user}@${ANSIBLE_SERVER_IP} 'ls -la'"
+                        // sshCommand remote: remote, command: 'ls -la'
                     }
                 }
             }
