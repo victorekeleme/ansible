@@ -34,7 +34,7 @@ pipeline {
                         remote.user = user
                         remote.identityFile = identity
 
-                        sh "ssh -i ${identity} ${user}@${ANSIBLE_SERVER_IP} 'ls -la'"
+                        sh "ssh -i ${identity} ${user}@${ANSIBLE_SERVER_IP} '/home/victor/jenkins/ansible-playbook docker-install.yaml'"
                         // sshCommand remote: remote, command: 'ls -la'
                     }
                 }
